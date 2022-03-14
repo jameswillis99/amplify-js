@@ -198,7 +198,6 @@ class MutationProcessor {
 					continue;
 				}
 				if (error.message === 'Offline') {
-					logger.debug('CAUGHT OFFLINE MESSAGE', error);
 					this.pause();
 					this.observer.error(error);
 					break;
@@ -207,7 +206,6 @@ class MutationProcessor {
 
 			let dequeued = false;
 			if (result === undefined) {
-				logger.debug('done retrying');
 				await this.storage.runExclusive(async storage => {
 					dequeued = true;
 					await this.outbox.dequeue(storage);

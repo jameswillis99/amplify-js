@@ -166,7 +166,7 @@ export class SyncEngine {
 		return new Observable<ControlMessageType<ControlMessage>>(observer => {
 			logger.log('starting sync engine...');
 
-			let subscriptions: ZenObservable.Subscription[] = [];
+			const subscriptions: ZenObservable.Subscription[] = [];
 
 			(async () => {
 				try {
