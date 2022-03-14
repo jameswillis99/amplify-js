@@ -43,6 +43,7 @@ type MutationProcessorEvent = {
 	modelDefinition: SchemaModel;
 	model: PersistentModel;
 	hasMore: boolean;
+	dequeued: boolean;
 };
 
 class MutationProcessor {
@@ -193,14 +194,22 @@ class MutationProcessor {
 
 				[result, opName, modelDefinition] = await authModeRetry();
 			} catch (error) {
-				if (error.message === 'Offline' || error.message === 'RetryMutation') {
+				if (error.message === 'RetryMutation') {
 					continue;
+				}
+				if (error.message === 'Offline') {
+					logger.debug('CAUGHT OFFLINE MESSAGE', error);
+					this.pause();
+					this.observer.error(error);
+					break;
 				}
 			}
 
+			let dequeued = false;
 			if (result === undefined) {
 				logger.debug('done retrying');
 				await this.storage.runExclusive(async storage => {
+					dequeued = true;
 					await this.outbox.dequeue(storage);
 				});
 				continue;
@@ -221,6 +230,7 @@ class MutationProcessor {
 				modelDefinition,
 				model: record,
 				hasMore,
+				dequeued,
 			});
 		}
 
@@ -251,19 +261,14 @@ class MutationProcessor {
 				MutationEvent: PersistentModelConstructor<MutationEvent>,
 				mutationEvent: MutationEvent
 			) => {
-				const [
-					query,
-					variables,
-					graphQLCondition,
-					opName,
-					modelDefinition,
-				] = this.createQueryVariables(
-					namespaceName,
-					model,
-					operation,
-					data,
-					condition
-				);
+				const [query, variables, graphQLCondition, opName, modelDefinition] =
+					this.createQueryVariables(
+						namespaceName,
+						model,
+						operation,
+						data,
+						condition
+					);
 
 				const authToken = await getTokenForCustomAuth(
 					authMode,
@@ -294,7 +299,7 @@ class MutationProcessor {
 								error.message === 'Network Error' ||
 								code === 'ECONNABORTED' // refers to axios timeout error caused by device's bad network condition
 							) {
-								if (!this.processing) {
+								if (this.processing) {
 									throw new NonRetryableError('Offline');
 								}
 								// TODO: Check errors on different env (react-native or other browsers)
@@ -358,17 +363,18 @@ class MutationProcessor {
 								const namespace = this.schema.namespaces[namespaceName];
 
 								// convert retry with to tryWith
-								const updatedMutation = createMutationInstanceFromModelOperation(
-									namespace.relationships,
-									modelDefinition,
-									opType,
-									modelConstructor,
-									retryWith,
-									graphQLCondition,
-									MutationEvent,
-									this.modelInstanceCreator,
-									mutationEvent.id
-								);
+								const updatedMutation =
+									createMutationInstanceFromModelOperation(
+										namespace.relationships,
+										modelDefinition,
+										opType,
+										modelConstructor,
+										retryWith,
+										graphQLCondition,
+										MutationEvent,
+										this.modelInstanceCreator,
+										mutationEvent.id
+									);
 
 								await this.storage.save(updatedMutation);
 
