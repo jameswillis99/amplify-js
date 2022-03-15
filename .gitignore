@@ -19,3 +19,9 @@ packages/**/cypress/videos/
 yarn.lock
 package-lock.json
 packages/*/.watchmanconfig
+!packages/datastore/lib/
+!packages/datastore/lib-esm/
+!packages/datastore/dist/
+!packages/datastore/es/
+!packages/datastore/esm/
+!packages/datastore/cjs/
