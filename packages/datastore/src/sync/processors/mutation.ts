@@ -204,10 +204,9 @@ class MutationProcessor {
 			}
 
 			if (result === undefined) {
-				// await this.storage.runExclusive(async storage => {
-				// 	dequeued = true;
-				// 	await this.outbox.dequeue(storage);
-				// });
+				await this.storage.runExclusive(async storage => {
+					await this.outbox.dequeue(storage);
+				});
 				continue;
 			}
 

@@ -431,9 +431,30 @@ var MutationProcessor = /** @class */ (function () {
 										}
 										return [3 /*break*/, 5];
 									case 5:
-										if (result === undefined) {
-											return [2 /*return*/, 'continue'];
-										}
+										if (!(result === undefined)) return [3 /*break*/, 7];
+										return [
+											4 /*yield*/,
+											this_1.storage.runExclusive(function (storage) {
+												return __awaiter(_this, void 0, void 0, function () {
+													return __generator(this, function (_a) {
+														switch (_a.label) {
+															case 0:
+																return [
+																	4 /*yield*/,
+																	this.outbox.dequeue(storage),
+																];
+															case 1:
+																_a.sent();
+																return [2 /*return*/];
+														}
+													});
+												});
+											}),
+										];
+									case 6:
+										_b.sent();
+										return [2 /*return*/, 'continue'];
+									case 7:
 										record = result.data[opName];
 										hasMore = false;
 										return [
@@ -466,7 +487,7 @@ var MutationProcessor = /** @class */ (function () {
 												});
 											}),
 										];
-									case 6:
+									case 8:
 										_b.sent();
 										this_1.observer.next({
 											operation: operation,
