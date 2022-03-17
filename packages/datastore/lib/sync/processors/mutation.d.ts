@@ -19,7 +19,6 @@ declare type MutationProcessorEvent = {
 	modelDefinition: SchemaModel;
 	model: PersistentModel;
 	hasMore: boolean;
-	dequeued: boolean;
 };
 declare class MutationProcessor {
 	private readonly schema;

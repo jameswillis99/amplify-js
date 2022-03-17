@@ -279,12 +279,7 @@ export class SyncEngine {
 								//#region process mutations
 								subscriptions.push(
 									this.mutationsProcessor.start().subscribe({
-										next: ({
-											modelDefinition,
-											model: item,
-											hasMore,
-											dequeued,
-										}) => {
+										next: ({ modelDefinition, model: item, hasMore }) => {
 											const modelConstructor = this.userModelClasses[
 												modelDefinition.name
 											] as PersistentModelConstructor<any>;
@@ -303,7 +298,6 @@ export class SyncEngine {
 												data: {
 													model: modelConstructor,
 													element: model,
-													isDeadLetter: dequeued,
 												},
 											});
 

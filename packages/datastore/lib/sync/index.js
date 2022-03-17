@@ -434,8 +434,7 @@ var SyncEngine = /** @class */ (function () {
 																	next: function (_a) {
 																		var modelDefinition = _a.modelDefinition,
 																			item = _a.model,
-																			hasMore = _a.hasMore,
-																			dequeued = _a.dequeued;
+																			hasMore = _a.hasMore;
 																		var modelConstructor =
 																			_this.userModelClasses[
 																				modelDefinition.name
@@ -457,7 +456,6 @@ var SyncEngine = /** @class */ (function () {
 																			data: {
 																				model: modelConstructor,
 																				element: model,
-																				isDeadLetter: dequeued,
 																			},
 																		});
 																		observer.next({

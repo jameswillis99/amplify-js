@@ -20,13 +20,13 @@ import {
 export declare let syncClasses: TypeConstructorMap;
 declare const initSchema: (userSchema: Schema) => Record<
 	string,
+	| NonModelTypeConstructor<any>
 	| PersistentModelConstructor<
 			any,
 			{
 				readOnlyFields: 'createdAt' | 'updatedAt';
 			}
 	  >
-	| NonModelTypeConstructor<any>
 >;
 export declare type ModelInstanceCreator = typeof modelInstanceCreator;
 declare function modelInstanceCreator<
